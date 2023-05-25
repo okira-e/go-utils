@@ -1,5 +1,10 @@
 package go_utils
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 // CompareMapsKeys returns true if the keys of two maps are equal.
 func CompareMapsKeys[kt comparable, vt comparable](a, b map[kt]vt) bool {
 	if len(a) != len(b) {
@@ -66,4 +71,13 @@ func CopyMap[kt comparable, vt interface{}](m map[kt]vt) map[kt]vt {
 	}
 
 	return mCpy
+}
+
+func PrintMap(mp map[any]any) {
+	b, err := json.MarshalIndent(mp, "", "  ")
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+
+	fmt.Print(string(b))
 }
