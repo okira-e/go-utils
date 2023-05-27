@@ -1,5 +1,7 @@
 package go_utils
 
+import "github.com/Okira-E/go-utils/interfaces"
+
 // DeleteFromSliceByValue deletes the first occurrence of an element from a slice.
 func DeleteFromSliceByValue[T comparable](slc []T, el T) {
 	for i, v := range slc {
@@ -68,4 +70,22 @@ func GetSlicesUnion[T comparable](a, b []T) []T {
 	}
 
 	return result
+}
+
+func GetValueByIndex[T any](arr []T, index int) (T, error) {
+	if len(arr) > index {
+		return arr[index], nil
+	}
+
+	return GetDefaultValue(arr[0]), nil
+}
+
+func GetSumOfNumbers[T interfaces.Summable](arr []T) T {
+	var sum T
+
+	for _, v := range arr {
+		sum += v
+	}
+
+	return sum
 }
