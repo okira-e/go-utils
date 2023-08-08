@@ -1,114 +1,42 @@
 package go_utils
 
 import (
-	"log"
 	"os"
+	"os/exec"
 )
 
-// CreateDir creates a directory.
-func CreateDir(dir string) error {
-	// 0755 is the permission for the directory.
-	// The difference between 0755 and 0777 is that 0755 is read and write for the owner and read for everyone else.
-	err := os.Mkdir(dir, 0755)
-	if err != nil {
-		return err
+// SpawnProcess runs a process and waits for it to finish.
+func SpawnProcess(dir string, silent bool, doWait bool, name string, args ...string) (*exec.Cmd, error) {
+	cmd := exec.Command(name, args...)
+
+	if !silent {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
+	// Set the working directory of the child processes.
+	cmd.Dir = dir
 
-	return nil
-}
-
-// CreateFile creates a file.
-func CreateFile(path string) error {
 	var err error
-
-	f, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = f.Close()
-	}()
-	if err != nil {
-		return err
+	if doWait {
+		// Wait for the command to finish.
+		err = cmd.Run()
+	} else {
+		// Start the command but don't wait for it to finish.
+		err = cmd.Start()
 	}
 
-	return nil
-}
-
-// DeleteFile deletes a file.
-func DeleteFile(path string) error {
-	err := os.Remove(path)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// FileExists checks if a file exists.
-func FileExists(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	}
-
-	return true
-}
-
-// FileSize returns the size of a file.
-func FileSize(path string) int64 {
-	info, err := os.Stat(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return info.Size()
-}
-
-// ReadFile reads a file.
-func ReadFile(path string) ([]byte, error) {
-	var err error
-
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		err = f.Close()
-	}()
 	if err != nil {
 		return nil, err
 	}
 
-	data := make([]byte, FileSize(path))
-	if _, err := f.Read(data); err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return cmd, nil
 }
 
-// WriteFile writes to a file.
-func WriteFile(path string, data []byte) error {
-	var err error
+// ExecCommand executes a command and returns the output.
+// It returns an error if the command fails to start or doesn't complete.
+func ExecCommand(name string, args ...string) (string, error) {
+	// An error is returned if the command fails to start or doesn't complete
+	out, err := exec.Command(name, args...).Output()
 
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = f.Close()
-	}()
-	if err != nil {
-		return err
-	}
-
-	if _, err := f.Write(data); err != nil {
-		return err
-	}
-
-	if err := f.Sync(); err != nil {
-		return err
-	}
-
-	return nil
+	return string(out), err
 }
