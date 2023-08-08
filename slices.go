@@ -77,7 +77,8 @@ func GetValueByIndex[T any](arr []T, index int) (T, error) {
 		return arr[index], nil
 	}
 
-	return GetDefaultValue(arr[0]), nil
+	defaultVal := new(T)
+	return *defaultVal, nil
 }
 
 func GetSumOfNumbers[T interfaces.Summable](arr []T) T {
