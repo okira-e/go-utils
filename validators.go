@@ -5,8 +5,8 @@ import (
 	"reflect"
 )
 
-// validate returns any missing fields specified in an object.
-func validate[T any](obj T, fields ...string) ([]string, error) {
+// Validate returns any missing fields specified in an object.
+func Validate[T any](obj T, fields ...string) ([]string, error) {
 	reflectedObject := reflect.ValueOf(&obj).Elem()
 	missingFields := make([]string, 0)
 
